@@ -2,6 +2,8 @@ package com.restApi.restapidemo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ public class RestApiDemoApplication {
 }
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/coffee")
 class RestApiDemoController {
 	private List<Coffee> coffeeList = new ArrayList<>();
 
@@ -34,12 +36,12 @@ class RestApiDemoController {
 	}
 
 	//@RequestMapping(value = "/coffee", method = RequestMethod.GET)
-	@GetMapping("/coffee")
+	@GetMapping
 	Iterable<Coffee> getCoffeeList() {
 		return coffeeList;
 	}
 
-	@GetMapping("/coffee/{id}")
+	@GetMapping("/{id}")
 	Optional<Coffee> getCoffeeById(@PathVariable String id) {
 		return coffeeList
 				.stream()
@@ -47,14 +49,14 @@ class RestApiDemoController {
 				.findFirst();
 	}
 
-	@PostMapping("/coffees")
+	@PostMapping
 	Coffee postCoffee(@RequestBody Coffee coffee) {
 		coffeeList.add(coffee);
 		return coffee;
 	}
 
-	@PutMapping("/coffee/{id}")
-	Coffee putCoffee(@PathVariable String id, @RequestBody Coffee coffee) {
+	@PutMapping("/{id}")
+	ResponseEntity<Coffee> putCoffee(@PathVariable String id, @RequestBody Coffee coffee) {
 		int coffeeIndex = -1;
 
 		for (int i = 0; i < coffeeList.size(); i++) {
@@ -65,10 +67,13 @@ class RestApiDemoController {
 			}
 		}
 
-		return (coffeeIndex == -1) ? postCoffee(coffee) : coffeeList.get(coffeeIndex);
+
+		return (coffeeIndex == -1) ?
+				new ResponseEntity<>(postCoffee(coffee), HttpStatus.CREATED) :
+				new ResponseEntity<>(coffee, HttpStatus.OK);
 	}
 
-	@DeleteMapping("/coffee/{id}")
+	@DeleteMapping("/{id}")
 	void deleteCoffee(@PathVariable String id) {
 		//Lambda
 		coffeeList.removeIf(c -> c.getId().equals(id));
