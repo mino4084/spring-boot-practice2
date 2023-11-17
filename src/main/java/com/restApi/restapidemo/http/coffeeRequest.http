@@ -13,7 +13,7 @@ Content-Type: application/json
 }
 
 
-### Send PUT request with json body
+### ### /coffee/999 PUT
 PUT http://localhost:8080/coffee/999
 Content-Type: application/json
 
@@ -22,12 +22,12 @@ Content-Type: application/json
   "name": "orange juice"
 }
 
-###
-GET http://localhost:8080/coffee/999
+### /coffee/999 GET
+GET http://localhost:8080/coffee/9992
 Accept: application/json
 
 
-### Send POST request with json body
+### /coffee POST
 POST http://localhost:8080/coffee
 Content-Type: application/json
 
@@ -36,16 +36,14 @@ Content-Type: application/json
   "name": "vanilla latte"
 }
 
-###
-
-GET http://localhost:8080/coffee/51eb6d50-6369-4850-99ef-da1dfc5c3f00
+### /coffee/{id} GET
+GET http://localhost:8080/coffee/570ddea3-7d33-472f-80bc-80440e500f6c
 Accept: application/json
 
-###
-
+### /coffee GET
 GET http://localhost:8080/coffee
 Accept: application/json
 
-###
+
 
 

@@ -1,4 +1,4 @@
-package com.restApi.restapidemo;
+package com.restApi;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +24,25 @@ public class RestApiDemoApplication {
 
 }
 
+@Component
+class DataLoader {
+	private final CoffeeRepository coffeeRepository;
+
+	public DataLoader(CoffeeRepository coffeeRepository) {
+		this.coffeeRepository = coffeeRepository;
+
+		coffeeRepository.saveAll(
+				List.of(
+						new Coffee("Cafe Latte"),
+						new Coffee("Americano"),
+						new Coffee("Espresso"),
+						new Coffee("Cappuccino"),
+						new Coffee("Mocha")
+				)
+		);
+	}
+}
+
 @RestController
 @RequestMapping("/coffee")
 class RestApiDemoController {
@@ -31,16 +51,6 @@ class RestApiDemoController {
 
 	public RestApiDemoController(CoffeeRepository coffeeRepository) {
         this.coffeeRepository = coffeeRepository;
-
-        coffeeRepository.saveAll(
-                List.of(
-                        new Coffee("Cafe Latte"),
-                        new Coffee("Americano"),
-                        new Coffee("Espresso"),
-                        new Coffee("Cappuccino"),
-                        new Coffee("Mocha")
-                )
-        );
 	}
 
 	@GetMapping
