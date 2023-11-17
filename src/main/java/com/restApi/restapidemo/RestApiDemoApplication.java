@@ -1,12 +1,14 @@
 package com.restApi.restapidemo;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,64 +26,58 @@ public class RestApiDemoApplication {
 @RestController
 @RequestMapping("/coffee")
 class RestApiDemoController {
-	private List<Coffee> coffeeList = new ArrayList<>();
 
-	public RestApiDemoController() {
-		coffeeList.addAll(List.of(
-				new Coffee("Cafe Latte"),
-				new Coffee("Americano"),
-				new Coffee("Espresso"),
-				new Coffee("Cappuccino")
-		));
+    private final CoffeeRepository coffeeRepository;
+
+	public RestApiDemoController(CoffeeRepository coffeeRepository) {
+        this.coffeeRepository = coffeeRepository;
+
+        coffeeRepository.saveAll(
+                List.of(
+                        new Coffee("Cafe Latte"),
+                        new Coffee("Americano"),
+                        new Coffee("Espresso"),
+                        new Coffee("Cappuccino"),
+                        new Coffee("Mocha")
+                )
+        );
 	}
 
-	//@RequestMapping(value = "/coffee", method = RequestMethod.GET)
 	@GetMapping
 	Iterable<Coffee> getCoffeeList() {
-		return coffeeList;
+        return coffeeRepository.findAll();
 	}
 
 	@GetMapping("/{id}")
 	Optional<Coffee> getCoffeeById(@PathVariable String id) {
-		return coffeeList
-				.stream()
-				.filter(c -> c.getId().equals(id))
-				.findFirst();
+        return coffeeRepository.findById(id);
 	}
 
 	@PostMapping
 	Coffee postCoffee(@RequestBody Coffee coffee) {
-		coffeeList.add(coffee);
-		return coffee;
+        return coffeeRepository.save(coffee);
 	}
 
 	@PutMapping("/{id}")
 	ResponseEntity<Coffee> putCoffee(@PathVariable String id, @RequestBody Coffee coffee) {
-		int coffeeIndex = -1;
 
-		for (int i = 0; i < coffeeList.size(); i++) {
-			if (coffeeList.get(i).getId().equals(id)) {
-				coffeeIndex = i;
-				coffeeList.set(i, coffee);
-				break;
-			}
-		}
-
-
-		return (coffeeIndex == -1) ?
-				new ResponseEntity<>(postCoffee(coffee), HttpStatus.CREATED) :
-				new ResponseEntity<>(coffee, HttpStatus.OK);
+        return coffeeRepository.existsById(id) ?
+                new ResponseEntity<>(coffeeRepository.save(coffee), HttpStatus.OK) :
+                new ResponseEntity<>(coffeeRepository.save(coffee), HttpStatus.CREATED);
 	}
 
 	@DeleteMapping("/{id}")
 	void deleteCoffee(@PathVariable String id) {
-		//Lambda
-		coffeeList.removeIf(c -> c.getId().equals(id));
+        coffeeRepository.deleteById(id);
 	}
 }
 
+interface CoffeeRepository extends CrudRepository<Coffee, String> {}
+
+@Entity
 class Coffee {
-	private final String id;
+	@Id
+	private String id;
 	private String name;
 
 	public Coffee(String id, String name) {
@@ -93,12 +89,20 @@ class Coffee {
 		this(UUID.randomUUID().toString(), name);
 	}
 
+	public Coffee() {
+
+	}
+
 	public String getId() {
 		return id;
 	}
 
 	public String getName() {
 		return name;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public void setName(String name) {
