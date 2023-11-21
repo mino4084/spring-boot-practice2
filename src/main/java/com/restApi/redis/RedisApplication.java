@@ -17,6 +17,8 @@ public class RedisApplication {
 	/**
 	 * RestTemplate 클래스는 RedisAccessor 클래스를 상속하는 RedisOperations 인터페이스의 구현체
 	 */
+	/*
+	CrudReposiotry 사용으로 빈 등록 삭제
 	@Bean
 	public RedisOperations<String, Aircraft> redisOperations(RedisConnectionFactory factory) {
 		Jackson2JsonRedisSerializer<Aircraft> serializer = new Jackson2JsonRedisSerializer<Aircraft>(Aircraft.class);
@@ -28,6 +30,7 @@ public class RedisApplication {
 
 		return template;
 	}
+	 */
 
 	public static void main(String[] args) {
 		SpringApplication.run(RedisApplication.class, args);

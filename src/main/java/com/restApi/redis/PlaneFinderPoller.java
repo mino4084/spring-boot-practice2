@@ -21,7 +21,10 @@ class PlaneFinderPoller {
             //WebClient.create("http://127.0.0.1:6379/aircraft");
 
     private final RedisConnectionFactory connectionFactory;
-    private final RedisOperations<String, Aircraft> redisOperations;
+    
+    // Repository 사용으로 해당 코드 제거
+    //private final RedisOperations<String, Aircraft> redisOperations;
+    private final AircraftRepository repository;
 
     /**
      * RedisConnectionFactory은 redis 의존성 추가로 스프링 부트의 '자동 설정'에 의해 주입.
@@ -30,9 +33,9 @@ class PlaneFinderPoller {
      * 이 두개의 빈을 생성자 주입을 통해 정의된 멤버 변수에 할당.
      */
     PlaneFinderPoller(RedisConnectionFactory connectionFactory,
-                      RedisOperations<String, Aircraft> redisOperations) {
+                      AircraftRepository repository) {
         this.connectionFactory = connectionFactory;
-        this.redisOperations = redisOperations;
+        this.repository = repository;
     }
 
     // 초당1회
@@ -55,12 +58,10 @@ class PlaneFinderPoller {
                 .bodyToFlux(Aircraft.class)// 응답 객체를 Aircraft 객체의 Flux로 변환
                 .filter(plane -> !plane.getReg().isEmpty())
                 .toStream()
-                .forEach(ac -> redisOperations.opsForValue().set(ac.getReg(), ac));
+                .forEach(repository::save);
 
         // 최신 캡쳐의 결과를 보고
-        redisOperations.opsForValue()
-                .getOperations()
-                .keys("*")
-                .forEach(ac -> System.out.println(redisOperations.opsForValue().get(ac)));
+        repository.findAll()
+                .forEach(System.out::println);
     }
 }
