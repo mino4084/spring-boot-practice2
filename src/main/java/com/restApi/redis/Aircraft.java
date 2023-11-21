@@ -19,7 +19,14 @@ import java.time.Instant;
 public class Aircraft {
     @Id
     private Long id;
-    private String callsign, squawk, reg, flightno, route, type, category;
+
+    private String callsign;
+
+    private String squawk;
+
+    private String reg;
+
+    private String flightno, route, type, category;
     private int altitude, heading, speed;
     @JsonProperty("vert_rate")
     private int vertRate;
@@ -40,4 +47,8 @@ public class Aircraft {
     private Instant posUpdateTime;
     @JsonProperty("bds40_seen_time")
     private Instant bds40SeenTime;
+
+    public String getReg() {
+        return reg;
+    }
 }
