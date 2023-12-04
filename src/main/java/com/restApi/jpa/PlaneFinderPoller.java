@@ -34,9 +34,7 @@ class PlaneFinderPoller {
          */
 
         repository.findAll().forEach(plane -> {
-            System.out.println("@@@@ plane" + plane.getId());
-            System.out.println("@@@@ plane" + plane.getReg());
-            System.out.println("@@@@ plane" + plane.getFlightno());
+            System.out.println("@@@@ plane" + plane.toString());
         });
     }
 }
